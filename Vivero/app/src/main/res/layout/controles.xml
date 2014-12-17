@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background= "#FEF1B5"
+    >
+
+
+
+                        <Switch
+
+                            android:text="Foco"
+                            android:id="@+id/foco"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="164dp"
+                            android:layout_alignParentTop="true"
+                            android:layout_centerHorizontal="true" />
+
+                        <Switch
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ventilador"
+                            android:id="@+id/vent"
+                            android:layout_below="@+id/foco"
+                            android:layout_centerHorizontal="true"
+                            android:checked="false" />
+
+
+
+</RelativeLayout>
