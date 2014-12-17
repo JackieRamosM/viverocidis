@@ -15,6 +15,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
@@ -35,7 +36,7 @@ public class Estadistica extends Activity {
             public void onClick(View v) {
 
                 // Server Request URL
-                String serverURL = "200.126.19.117:8080";
+                String serverURL = "http://200.126.19.117:8080";
 
                 // Create Object and call AsyncTask execute Method
                 new LongOperation().execute(serverURL);
@@ -67,8 +68,7 @@ public class Estadistica extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-
-
+    // Class with extends AsyncTask class
     private class LongOperation  extends AsyncTask<String, Void, Void> {
 
         private final HttpClient Client = new DefaultHttpClient();
@@ -76,7 +76,7 @@ public class Estadistica extends Activity {
         private String Error = null;
         private ProgressDialog Dialog = new ProgressDialog(Estadistica.this);
 
-        EditText uiUpdate = (EditText) findViewById(R.id.output);
+        TextView uiUpdate = (TextView) findViewById(R.id.output);
 
         protected void onPreExecute() {
             // NOTE: You can call UI Element here.
@@ -95,9 +95,11 @@ public class Estadistica extends Activity {
                 // NOTE: Don't call UI Element here.
 
                 // Server url call by GET method
-                HttpGet httpget = new HttpGet(urls[0]);
+                HttpPost httpget = new HttpPost(urls[0]);
+                System.out.println(urls[0]);
                 ResponseHandler<String> responseHandler = new BasicResponseHandler();
                 Content = Client.execute(httpget, responseHandler);
+                System.out.println(Content);
 
             } catch (ClientProtocolException e) {
                 Error = e.getMessage();
@@ -109,7 +111,6 @@ public class Estadistica extends Activity {
 
             return null;
         }
-
         protected void onPostExecute(Void unused) {
             // NOTE: You can call UI Element here.
 
@@ -128,4 +129,7 @@ public class Estadistica extends Activity {
         }
 
     }
+
+
+
 }
