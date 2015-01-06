@@ -17,15 +17,24 @@
                             android:layout_alignParentTop="true"
                             android:layout_centerHorizontal="true" />
 
-                        <Switch
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Ventilador"
-                            android:id="@+id/vent"
-                            android:layout_below="@+id/foco"
-                            android:layout_centerHorizontal="true"
-                            android:checked="false" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Ventilación"
+        android:textSize="20sp"
+        android:id="@+id/textView"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/vent"
+        android:spinnerMode="dropdown"
+        android:layout_below="@+id/textView"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView" />
 
 
 </RelativeLayout>
