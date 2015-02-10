@@ -2,6 +2,7 @@ package espol.cidis.vivero.vivero;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,38 +12,46 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.w3c.dom.Document;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLOutput;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by soporte on 12/12/14.
  */
 public class Estadistica extends Activity {
+    LineChart chartt;
+    ArrayList<Temperatura> arTemp= new ArrayList<>();
 
-    private Button btnestt;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.est);
-        btnestt = (Button) findViewById(R.id.btnestt);
-        btnestt.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        chartt= (LineChart) findViewById(R.id.chart);
+        new Connection().execute();
 
-                // Server Request URL
-                String serverURL = "http://200.126.19.117:8080";
-
-                // Create Object and call AsyncTask execute Method
-                new LongOperation().execute(serverURL);
-
-            }
-        });
+        chartfunction(arTemp);
     }
 
 
@@ -67,69 +76,67 @@ public class Estadistica extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+    private class Connection extends AsyncTask {
 
-    // Class with extends AsyncTask class
-    private class LongOperation  extends AsyncTask<String, Void, Void> {
-
-        private final HttpClient Client = new DefaultHttpClient();
-        private String Content;
-        private String Error = null;
-        private ProgressDialog Dialog = new ProgressDialog(Estadistica.this);
-
-        TextView uiUpdate = (TextView) findViewById(R.id.output);
-
-        protected void onPreExecute() {
-            // NOTE: You can call UI Element here.
-
-            //UI Element
-            uiUpdate.setText("Output : ");
-            Dialog.setMessage("Downloading source..");
-            Dialog.show();
-        }
-
-        // Call after onPreExecute method
-        protected Void doInBackground(String... urls) {
-            try {
-
-                // Call long running operations here (perform background computation)
-                // NOTE: Don't call UI Element here.
-
-                // Server url call by GET method
-                HttpPost httpget = new HttpPost(urls[0]);
-                System.out.println(urls[0]);
-                ResponseHandler<String> responseHandler = new BasicResponseHandler();
-                Content = Client.execute(httpget, responseHandler);
-                System.out.println(Content);
-
-            } catch (ClientProtocolException e) {
-                Error = e.getMessage();
-                cancel(true);
-            } catch (IOException e) {
-                Error = e.getMessage();
-                cancel(true);
-            }
-
+        @Override
+        protected Object doInBackground(Object... arg0) {
+            connect();
             return null;
-        }
-        protected void onPostExecute(Void unused) {
-            // NOTE: You can call UI Element here.
-
-            // Close progress dialog
-            Dialog.dismiss();
-
-            if (Error != null) {
-
-                uiUpdate.setText("Output : "+Error);
-
-            } else {
-
-                uiUpdate.setText("Output : "+Content);
-
-            }
         }
 
     }
+    private void connect() {
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost("http://200.126.19.120:7070");
+        try {
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+            nameValuePairs.add(new BasicNameValuePair("Request", "Temperature"));
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            System.out.println(httppost);
 
+            // Execute HTTP Post Request
+            HttpResponse response = httpclient.execute(httppost);
+            String pars = EntityUtils.toString(response.getEntity());
+            String[] result = pars.split(" ");
+            for (int x=0; x<result.length; x=x+3) {
+                arTemp.add(new Temperatura(result[x], result[x + 1], result[x + 2]));
+            }
 
+        } catch (ClientProtocolException e) {
+        } catch (IOException e) {
+        }
+    }
+
+    /*
+    *
+    *
+    * */
+
+    public void chartfunction(ArrayList<Temperatura> data){
+        LineChart charttt = new LineChart(this);
+        ArrayList<Entry> valsComp1 = new ArrayList<Entry>();
+        ArrayList<Entry> valsComp2 = new ArrayList<Entry>();
+        Entry c1e1 = new Entry(100.000f, 0); // 0 == quarter 1
+        valsComp1.add(c1e1);
+        Entry c1e2 = new Entry(50.000f, 1); // 1 == quarter 2 ...
+        valsComp1.add(c1e2);
+        // and so on ...
+
+        Entry c2e1 = new Entry(120.000f, 0); // 0 == quarter 1
+        valsComp2.add(c2e1);
+        Entry c2e2 = new Entry(110.000f, 1); // 1 == quarter 2 ...
+        valsComp2.add(c2e2);
+        LineDataSet setComp1 = new LineDataSet(valsComp1, "Company 1");
+        LineDataSet setComp2 = new LineDataSet(valsComp2, "Company 2");
+
+        ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
+        dataSets.add(setComp1);
+        dataSets.add(setComp2);
+
+        ArrayList<String> xVals = new ArrayList<String>();
+        xVals.add("1.Q"); xVals.add("2.Q"); xVals.add("3.Q"); xVals.add("4.Q");
+        LineData dat = new LineData(xVals, dataSets);
+        chartt.setData(dat);
+    }
 
 }

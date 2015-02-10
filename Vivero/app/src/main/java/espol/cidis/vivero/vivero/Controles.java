@@ -73,6 +73,7 @@ public class Controles extends Activity {
                     StrictMode.setThreadPolicy(policy);
                     control="Turn";
                     modo="On";
+                    System.out.println("++++++++++++++++++ ON");
                     new Connection().execute();
 
 
@@ -145,32 +146,30 @@ public class Controles extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-          private class Connection extends AsyncTask {
+    private class Connection extends AsyncTask {
 
-            @Override
-            protected Object doInBackground(Object... arg0) {
-                connect();
-                return null;
-            }
-
+        @Override
+        protected Object doInBackground(Object... arg0) {
+            connect();
+            return null;
         }
 
-        private void connect() {
-            String responseStr="";
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost("http://200.126.19.117:8080");
-            try {
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-                nameValuePairs.add(new BasicNameValuePair(control, modo));
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+    }
 
-                // Execute HTTP Post Request
-                HttpResponse response = httpclient.execute(httppost);
-            } catch (ClientProtocolException e) {
-                Log.d("HTTPCLIENT", e.getLocalizedMessage());
-            } catch (IOException e) {
-                Log.d("HTTPCLIENT", e.getLocalizedMessage());
-            }
+    private void connect() {
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost("http://200.126.19.120:7070");
+        try {
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+            nameValuePairs.add(new BasicNameValuePair(control, modo));
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+            // Execute HTTP Post Request
+            HttpResponse response = httpclient.execute(httppost);
+            System.out.println(response);
+        } catch (ClientProtocolException e) {
+        } catch (IOException e) {
         }
+    }
 
 }
